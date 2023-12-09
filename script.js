@@ -8,13 +8,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // console.log("DATA: ", data);
       const productGroups = groupProducts(data);
-      // console.log("PRODUCT GROUPS: ", productGroups);
+      console.log("PRODUCT GROUPS: ", productGroups);
+
+      const productsToDisplay = [];
+
       Object.values(productGroups).forEach((group) => {
-        const colorTally = groupByColor(group);
-        console.log(colorTally);
+        const { color, availableSizes } = chooseColor(group);
+        // console.log(chosenColor);
+        const chosenVariant = group.find((variant) => variant.color === color);
+
+        chosenVariant.availableSizes = availableSizes;
+        // console.log(chosenVariant);
+        productsToDisplay.push(chosenVariant);
       });
 
-      renderProducts(data);
+      productsToDisplay.sort((a, b) => b.priority - a.priority);
+
+      console.log(productsToDisplay);
+
+      renderProducts(productsToDisplay);
     })
     .catch((error) => console.log("Error fetching data:", error));
 });
@@ -36,11 +48,11 @@ function groupProducts(products) {
 }
 
 // Group by color and count distinct sizes
-function groupByColor(productVariants) {
-  return productVariants.reduce((result, item) => {
+function chooseColor(productVariants) {
+  const colorGroups = productVariants.reduce((result, item) => {
     const { color, size, priority } = item;
 
-    if (!result[color]) {
+    if (!result.hasOwnProperty(color)) {
       result[color] = {
         sizeCount: 1,
         sizes: new Set([size]),
@@ -54,9 +66,28 @@ function groupByColor(productVariants) {
 
     return result;
   }, {});
-}
 
-////////////////////////////////////////////////////
+  for (const color in colorGroups) {
+    const { sizeCount, totalPriority } = colorGroups[color];
+    colorGroups[color].averagePriority = totalPriority / sizeCount;
+  }
+
+  let chosenColor = null;
+  let maxAveragePriority = -Infinity;
+
+  for (const color in colorGroups) {
+    const { averagePriority } = colorGroups[color];
+    if (averagePriority > maxAveragePriority) {
+      maxAveragePriority = averagePriority;
+      chosenColor = color;
+    }
+  }
+
+  return {
+    color: chosenColor,
+    availableSizes: [...colorGroups[chosenColor].sizes], // convert set into array
+  };
+}
 
 function renderProducts(products) {
   products.slice(0, 8).forEach((product) => {
@@ -65,11 +96,13 @@ function renderProducts(products) {
     productTile.innerHTML = `
         <div class="image-wrapper">
           <img src=${product.image} alt=${product.imageAlt} />
-          <span class="price">${product.size}</span>
+          <span class="price">Available sizes: ${product.availableSizes.join(
+            ", "
+          )}</span>
         </div>
         <div class="product-info">
           <p>${product.name}</p>
-          <p>$${product.priceObj.value}</p>
+          <p>£${product.priceObj.value}</p>
         </div>
         `;
     carousel.appendChild(productTile);
