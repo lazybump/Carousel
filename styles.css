@@ -10,18 +10,18 @@ html {
 
 body {
   min-height: 100%;
-  /* background-color: #2c2c2c; */
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.wrapper {
+.carousel-wrapper {
   width: 80%;
   position: relative;
 }
 
-.carousel {
+.carousel-track {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(200px, 290px);
@@ -30,7 +30,6 @@ body {
 }
 
 .image-wrapper {
-  /* outline: 2px solid red; */
   position: relative;
   & .price {
     padding: 4px;
@@ -46,8 +45,7 @@ body {
 }
 
 .product-tile {
-  /* background: green; */
-  /* color: white; */
+  list-style: none;
   .product-info {
     & > * {
       margin-top: 5px;
