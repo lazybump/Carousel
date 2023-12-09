@@ -31,7 +31,7 @@ export function renderProducts(products) {
     productTile.innerHTML = `
         <div class="image-wrapper">
           <img src=${product.image} alt=${product.imageAlt} />
-          <span class="price">Available sizes: ${product.availableSizes.join(
+          <span class="sizes">Available sizes: ${product.availableSizes.join(
             ", "
           )}</span>
         </div>
