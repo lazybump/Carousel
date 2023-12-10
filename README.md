@@ -1,1 +1,3 @@
 # Carousel
+
+Simple product carousel
